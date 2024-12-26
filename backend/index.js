@@ -151,6 +151,76 @@ app.post('/add-note', authenticateToken, async (req, res) => {
     }
 });
 
+// Edit Note
+app.put('/edit-note/:noteId', authenticateToken, async (req, res) => {
+    const noteId = req.params.noteId;
+    const { title, content, tags, isPinned } = req.body;
+    const { user } = req.user;
+
+    if (!title && !content && !tags) {
+        return res.status(400).json({ error: true, message: 'At least one field is required' });
+    }
+
+    try {
+        const note = await Note.findOne({ _id: noteId, userId: user._id });
+
+        if (!note) {
+            return res.status(404).json({ error: true, message: 'Note not found' });
+        }
+
+        if (title) 
+            note.title = title;
+        
+
+        if (content) 
+            note.content = content;
+        
+
+        if (tags) 
+            note.tags = tags;
+        
+
+        if (isPinned) 
+            note.isPinned = isPinned;
+
+        await note.save();
+
+        return res.json({ error: false, note, message: 'Note updated successfully' });
+
+    } catch (error) {
+        return res.status(500).json({ error: true, message: 'Internal server error' });
+    }
+});
+
+//Delete Notes
+app.get("/delete-note/:noteID", authenticateToken, async (req,res) =>{
+    const noteId = req.params.noteId;
+    const { user } = req.user;
+
+    try {
+        const note = await Note.findOne({ _id: noteId, userId: user.Id
+        });
+        
+        if (!note) {
+            return res.status(404).json({ error: true, message: "Note not found"});
+        }
+
+        await Note.deleteOne({_id: noteId, userId: user.Id
+        });
+
+        return res.json({
+            error: false,
+            message: "Note deleted successfully",
+
+        });
+    } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message: "Internal Server Error",
+        });
+    }
+});
+
 app.listen(8000);
 
 module.exports = app;
