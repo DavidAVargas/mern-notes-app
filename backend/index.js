@@ -121,6 +121,12 @@ app.post('/login', async (req, res) => {
 
 });
 
+//Get User
+app.get('/get-user', async (req, res)=> {
+    
+
+});
+
 // Add Note
 app.post('/add-note', authenticateToken, async (req, res) => {
     const { title, content, tags } = req.body;
